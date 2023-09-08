@@ -66,21 +66,16 @@ document.addEventListener("DOMContentLoaded", function () {
       finishButton.classList.add("red");
 
       finishButton.addEventListener("click", function () {
-        const parentBookshelf = completeBookshelfList;
-        const siblingBookshelf = incompleteBookshelfList;
+        toggleBookStatus(book);
+      });
+    } else {
+      const finishButton = book.querySelector("button.red");
+      finishButton.innerText = "Selesai dibaca";
+      finishButton.classList.remove("red");
+      finishButton.classList.add("green");
 
-        if (parentBookshelf.contains(book)) {
-          parentBookshelf.removeChild(book);
-          siblingBookshelf.appendChild(book);
-        }
-
-        inputBookIsComplete.checked = false;
-        finishButton.innerText = "Selesai dibaca";
-        finishButton.classList.remove("red");
-        finishButton.classList.add("green");
-
-        clearInputFields();
-        updateStorage();
+      finishButton.addEventListener("click", function () {
+        toggleBookStatus(book);
       });
     }
     updateStorage();
@@ -109,24 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
     finishButton.classList.add(isComplete ? "green" : "red");
 
     finishButton.addEventListener("click", function () {
-      const parentBookshelf = isComplete
-        ? incompleteBookshelfList
-        : completeBookshelfList;
-      const siblingBookshelf = isComplete
-        ? completeBookshelfList
-        : incompleteBookshelfList;
-
-      if (parentBookshelf.contains(book)) {
-        parentBookshelf.removeChild(book);
-        siblingBookshelf.appendChild(book);
-      }
-
-      inputBookIsComplete.checked = !isComplete;
-      finishButton.innerText = isComplete
-        ? "Selesai dibaca"
-        : "Belum selesai dibaca";
-
-      updateStorage();
+      toggleBookStatus(book);
     });
 
     const deleteButton = document.createElement("button");
@@ -139,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const parentBookshelf = isComplete
           ? completeBookshelfList
           : incompleteBookshelfList;
-
         if (parentBookshelf.contains(book)) {
           parentBookshelf.removeChild(book);
         }
@@ -165,6 +142,28 @@ document.addEventListener("DOMContentLoaded", function () {
     book.appendChild(actionDiv);
 
     return book;
+  }
+
+  function toggleBookStatus(book) {
+    const parentBookshelf = book.parentElement;
+    const isComplete = parentBookshelf === completeBookshelfList;
+    const siblingBookshelf = isComplete
+      ? incompleteBookshelfList
+      : completeBookshelfList;
+
+    if (parentBookshelf.contains(book)) {
+      parentBookshelf.removeChild(book);
+      siblingBookshelf.appendChild(book);
+    }
+
+    const finishButton = book.querySelector("button");
+    finishButton.innerText = isComplete
+      ? "Selesai dibaca"
+      : "Belum selesai dibaca";
+    finishButton.classList.toggle("green");
+    finishButton.classList.toggle("red");
+
+    updateStorage();
   }
 
   function editBook(title, author, year, isComplete, book) {
