@@ -79,10 +79,11 @@ document.addEventListener("DOMContentLoaded", function () {
         finishButton.classList.remove("red");
         finishButton.classList.add("green");
 
-        updateStorage();
         clearInputFields();
+        updateStorage();
       });
     }
+    updateStorage();
   }
 
   function createBook(title, author, year, isComplete) {
