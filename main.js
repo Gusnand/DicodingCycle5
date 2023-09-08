@@ -52,14 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
     bookshelf.appendChild(book);
 
     if (isComplete) {
-      const parentBookshelf = incompleteBookshelfList;
-      const siblingBookshelf = completeBookshelfList;
-
-      if (parentBookshelf.contains(book)) {
-        parentBookshelf.removeChild(book);
-        siblingBookshelf.appendChild(book);
-      }
-
       const finishButton = book.querySelector("button.green");
       finishButton.innerText = "Belum selesai dibaca";
       finishButton.classList.remove("green");
@@ -72,6 +64,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (parentBookshelf.contains(book)) {
           parentBookshelf.removeChild(book);
           siblingBookshelf.appendChild(book);
+        } else if (siblingBookshelf.contains(book)) {
+          siblingBookshelf.removeChild(book);
+          parentBookshelf.appendChild(book);
         }
 
         inputBookIsComplete.checked = false;
@@ -119,6 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (parentBookshelf.contains(book)) {
         parentBookshelf.removeChild(book);
         siblingBookshelf.appendChild(book);
+      } else if (siblingBookshelf.contains(book)) {
+        siblingBookshelf.removeChild(book);
+        parentBookshelf.appendChild(book);
       }
 
       inputBookIsComplete.checked = !isComplete;
