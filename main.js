@@ -52,6 +52,14 @@ document.addEventListener("DOMContentLoaded", function () {
     bookshelf.appendChild(book);
 
     if (isComplete) {
+      const parentBookshelf = incompleteBookshelfList;
+      const siblingBookshelf = completeBookshelfList;
+
+      if (parentBookshelf.contains(book)) {
+        parentBookshelf.removeChild(book);
+        siblingBookshelf.appendChild(book);
+      }
+
       const finishButton = book.querySelector("button.green");
       finishButton.innerText = "Belum selesai dibaca";
       finishButton.classList.remove("green");
@@ -64,9 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (parentBookshelf.contains(book)) {
           parentBookshelf.removeChild(book);
           siblingBookshelf.appendChild(book);
-        } else if (siblingBookshelf.contains(book)) {
-          siblingBookshelf.removeChild(book);
-          parentBookshelf.appendChild(book);
         }
 
         inputBookIsComplete.checked = false;
@@ -114,9 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (parentBookshelf.contains(book)) {
         parentBookshelf.removeChild(book);
         siblingBookshelf.appendChild(book);
-      } else if (siblingBookshelf.contains(book)) {
-        siblingBookshelf.removeChild(book);
-        parentBookshelf.appendChild(book);
       }
 
       inputBookIsComplete.checked = !isComplete;
@@ -132,18 +134,30 @@ document.addEventListener("DOMContentLoaded", function () {
     deleteButton.classList.add("red");
 
     deleteButton.addEventListener("click", function () {
-      const parentBookshelf = isComplete
-        ? completeBookshelfList
-        : incompleteBookshelfList;
+      const confirmation = confirm("Anda yakin ingin menghapus buku ini?");
+      if (confirmation) {
+        const parentBookshelf = isComplete
+          ? completeBookshelfList
+          : incompleteBookshelfList;
 
-      if (parentBookshelf.contains(book)) {
-        parentBookshelf.removeChild(book);
+        if (parentBookshelf.contains(book)) {
+          parentBookshelf.removeChild(book);
+        }
+        updateStorage();
       }
-      updateStorage();
+    });
+
+    const editButton = document.createElement("button");
+    editButton.innerText = "Edit";
+    editButton.classList.add("blue");
+
+    editButton.addEventListener("click", function () {
+      editBook(title, author, year, isComplete, book);
     });
 
     actionDiv.appendChild(finishButton);
     actionDiv.appendChild(deleteButton);
+    actionDiv.appendChild(editButton);
 
     book.appendChild(bookTitle);
     book.appendChild(bookAuthor);
@@ -151,6 +165,33 @@ document.addEventListener("DOMContentLoaded", function () {
     book.appendChild(actionDiv);
 
     return book;
+  }
+
+  function editBook(title, author, year, isComplete, book) {
+    const newTitle = prompt("Edit Judul Buku:", title);
+    if (newTitle === null || newTitle === "") return; // Batal atau input kosong
+
+    const newAuthor = prompt("Edit Penulis Buku:", author);
+    if (newAuthor === null || newAuthor === "") return;
+
+    const newYear = prompt("Edit Tahun Buku:", year);
+    if (newYear === null || newYear === "") return;
+
+    // Perbarui data buku dengan yang baru
+    title = newTitle;
+    author = newAuthor;
+    year = newYear;
+
+    // Perbarui tampilan buku
+    const bookTitle = book.querySelector("h3");
+    const bookAuthor = book.querySelector("p:nth-child(2)");
+    const bookYear = book.querySelector("p:nth-child(3)");
+
+    bookTitle.innerText = title;
+    bookAuthor.innerText = `Penulis: ${author}`;
+    bookYear.innerText = `Tahun: ${year}`;
+
+    updateStorage();
   }
 
   function clearInputFields() {
@@ -220,7 +261,10 @@ document.addEventListener("DOMContentLoaded", function () {
         .querySelector("p:nth-child(2)")
         .innerText.slice(9)
         .toLowerCase();
-      const year = book.querySelector("p:nth-child(3)").innerText.slice(7);
+      const year = book
+        .querySelector("p:nth-child(3)")
+        .innerText.slice(7)
+        .toLowerCase();
 
       if (
         title.includes(keyword) ||
